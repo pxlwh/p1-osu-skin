@@ -181,12 +181,10 @@ def cursor(src):
     """Beafowl's cyan cursor and trail made green: blue := red keeps white white.
 
     Beafowl ships no @2x, so none is written here either; a leftover @2x would win."""
-    for name in ("cursor", "cursortrail"):
-        im = Image.open(src / f"{name}.png").convert("RGBA")
-        r, g, _, a = im.split()
-        if name == "cursortrail":
-            a = a.point(lambda v: v // 2)
-        Image.merge("RGBA", (r, g, r, a)).save(OUT / f"{name}.png")
+    im = Image.open(src / "cursor.png").convert("RGBA")
+    r, g, _, a = im.split()
+    Image.merge("RGBA", (r, g, r, a)).save(OUT / "cursor.png")
+    blank("cursortrail")
 
     s = C(16, 16)
     s.disc(8, 8, 3, rgba(GRN, 0.5))
@@ -273,17 +271,17 @@ def score_fonts():
 
         f2 = ImageFont.truetype(FONT, 14 * K)
         e = C(11 if key not in ("comma", "dot") else 5, 14)
-        e.d.text((e.w * K / 2, e.h * K / 2), ch, font=f2, fill=rgba(WHITE), anchor="mm")
+        e.d.text((e.w * K / 2, e.h * K / 2), ch, font=f2, fill=rgba((170, 255, 170)), anchor="mm")
         e.save(f"scoreentry-{key}")
 
 
 def input_overlay():
     bg = C(193, 55)
-    bg.rect(1, 1, 192, 54, fill=rgba((0, 0, 0), 0.7), outline=rgba(WHITE, 0.25))
+    bg.rect(1, 1, 192, 54, fill=rgba((0, 0, 0), 0.85), outline=rgba(GRN, 0.34))
     bg.save("inputoverlay-background")
 
     k = C(43, 46)
-    k.rect(4, 5, 39, 41, fill=rgba(WHITE, 0.06), outline=rgba(WHITE), width=2)
+    k.rect(4, 5, 39, 41, fill=rgba((0, 0, 0), 0.8), outline=rgba(WHITE), width=2)
     k.save("inputoverlay-key")
 
 
@@ -415,7 +413,6 @@ def song_select():
     # Tinted by the game per state, so grey scale with a hairline frame.
     m = C(690, 85)
     m.rect(1, 1, 689, 84, fill=rgba(WHITE, 0.10), outline=rgba(WHITE, 0.45))
-    m.brackets(1, 1, 689, 84, 14, rgba(WHITE), 2)
     m.save("menu-button-background")
 
     t = C(142, 24)
@@ -519,9 +516,7 @@ def extras():
     sel.ring(64, 64, 60, 3, rgba(WHITE))
     sel.save("hitcircleselect")
 
-    rip = C(128, 128)
-    rip.ring(64, 64, 50, 2, rgba(WHITE, 0.6))
-    rip.save("cursor-ripple")
+    blank("cursor-ripple")
 
     text_img("multi-skipped", "skip", 18, rgba(WHITE, 0.8), pad=4, glow=0)
     text_img("score-pp", "pp", 40, rgba(WHITE), pad=4, glow=2)
@@ -554,10 +549,9 @@ SpinnerNoBlink: 1
 
 [Colours]
 Combo1: 0,255,0
-Combo2: 0,204,0
-Combo3: 120,255,120
-Combo4: 0,160,60
-InputOverlayText: 255,255,255
+Combo2: 255,85,85
+Combo3: 255,176,0
+InputOverlayText: 0,255,0
 MenuGlow: 0,255,0
 SliderBorder: 0,120,0
 SliderTrackOverride: 0,18,0
