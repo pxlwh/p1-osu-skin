@@ -3,10 +3,12 @@
 
 Every element is drawn at SS x the @2x size, then downsampled to @2x and @1x.
 Sizes below are in @1x ("logical") pixels. Sounds and the cursor come from the
-Beafowl skin. Usage: gen.py <out_dir> <beafowl_dir>
+Beafowl skin; gameplay sounds can come from another skin.
+Usage: gen.py <out_dir> <beafowl_dir> [hitsound_skin_dir]
 """
 
 import math
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -583,6 +585,16 @@ def main():
     for snd in src.iterdir():
         if snd.suffix.lower() in (".wav", ".ogg", ".mp3"):
             shutil.copy2(snd, OUT / snd.name)
+    if len(sys.argv) > 3:
+        # Gameplay sounds from another skin replace Beafowl's entirely: same
+        # names in another extension, or numbered variants, would mix sets.
+        hit = re.compile(r"^((normal|soft|drum)-(hit|slider)|nightcore-|combobreak)", re.I)
+        for f in OUT.iterdir():
+            if f.suffix.lower() in (".wav", ".ogg", ".mp3") and hit.match(f.name):
+                f.unlink()
+        for snd in Path(sys.argv[3]).rglob("*"):
+            if snd.suffix.lower() in (".wav", ".ogg", ".mp3") and hit.match(snd.name):
+                shutil.copy2(snd, OUT / snd.name)
     print(f"{sum(1 for _ in OUT.iterdir())} files in {OUT}")
 
 
