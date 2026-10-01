@@ -116,9 +116,10 @@ def text_img(name, s, size, col, pad=8, glow=3, font=FONT):
 def hitcircles():
     # Tinted by the combo colour: drawn white so the tint shows through.
     c = C(128, 128)
-    c.disc(64, 64, 58, rgba(WHITE, 0.16))
-    c.ring(64, 64, 58, 3, rgba(WHITE))
-    c.ring(64, 64, 49, 1, rgba(WHITE, 0.35))
+    # Ring spans 58 to 63 so at slider heads it covers the body's border.
+    c.disc(64, 64, 60, rgba(WHITE, 0.16))
+    c.ring(64, 64, 63, 5, rgba(WHITE))
+    c.ring(64, 64, 50, 1, rgba(WHITE, 0.35))
     c.save("hitcircle")
 
     blank("hitcircleoverlay")
@@ -560,7 +561,7 @@ Combo3: 120,255,120
 Combo4: 0,160,60
 InputOverlayText: 255,255,255
 MenuGlow: 0,255,0
-SliderBorder: 0,255,0
+SliderBorder: 0,120,0
 SliderTrackOverride: 0,18,0
 SongSelectActiveText: 0,255,0
 SongSelectInactiveText: 0,170,0
