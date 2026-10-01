@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the pax.moe osu!stable skin.
+"""Generate P1, an osu!stable skin styled after pax.moe.
 
 Every element is drawn at SS x the @2x size, then downsampled to @2x and @1x.
 Sizes below are in @1x ("logical") pixels. Sounds and the cursor come from the
@@ -531,7 +531,7 @@ def extras():
 # ---------------------------------------------------------------- skin.ini
 
 SKIN_INI = """[General]
-Name: pax.moe
+Name: P1
 Author: pax
 Version: 2.7
 AnimationFramerate: -1
