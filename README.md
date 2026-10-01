@@ -26,7 +26,7 @@ This builds the visuals only, with no sounds, so osu! uses its default sounds. T
 python3 gen.py out/P1 --assets "Skins/Some Skin" --hitsounds "Skins/Other Skin" --osk P1.osk
 ```
 
-* `--assets` takes every sound and the cursor trail (recoloured green) from that skin.
+* `--assets` takes every sound and the cursor trail from that skin.
 * `--hitsounds` replaces only the gameplay sounds (hit, slider, nightcore, combobreak) with another skin's set. Any matching sound from `--assets` is removed first, in every extension and numbering, so two sets never mix.
 * `--osk` also packs the finished skin into an `.osk` (a zip of the skin folder).
 

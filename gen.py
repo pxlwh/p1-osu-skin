@@ -25,6 +25,7 @@ GRN = (0, 255, 0)
 GRN2 = (0, 204, 0)          # hyprland gradient end
 DARK = (0, 34, 0)           # hyprland inactive border
 RED = (255, 85, 85)         # quickshell bar warning
+CYAN = (40, 234, 242)       # cursor; matches the Beafowl trail so the two blend
 WHITE = (255, 255, 255)
 
 
@@ -89,7 +90,9 @@ class C:
 
     def glow(self, radius, strength=1.0):
         """Blur a copy of the current layer underneath it, like text-shadow."""
-        blur = self.im.filter(ImageFilter.GaussianBlur(self.p(radius)))
+        # Blur premultiplied (RGBa): transparent pixels are stored as black, and a
+        # straight RGBA blur mixes that black into the edge as a dark fringe.
+        blur = self.im.convert("RGBa").filter(ImageFilter.GaussianBlur(self.p(radius))).convert("RGBA")
         if strength != 1.0:
             a = blur.getchannel("A").point(lambda v: min(255, round(v * strength)))
             blur.putalpha(a)
@@ -195,19 +198,19 @@ def judgements():
 
 
 def cursor(src=None):
-    """A solid dot: white core, phosphor green band, short glow. The trail comes
-    from --assets when that skin has one (recoloured green: blue := red keeps
-    white white; no @2x is written so none can override it), otherwise none."""
+    """A solid dot: white core, cyan band, wide soft glow that fades into the
+    trail. Cyan so the cursor stands apart from the green circles. The trail
+    comes from --assets when that skin has one, used as is (no @2x is written
+    so none can override it), otherwise none."""
     trail = src / "cursortrail.png" if src else None
     if trail and trail.exists():
-        r, g, _, a = Image.open(trail).convert("RGBA").split()
-        Image.merge("RGBA", (r, g, r, a)).save(OUT / "cursortrail.png")
+        shutil.copy(trail, OUT / "cursortrail.png")
     else:
         blank("cursortrail")
-    c = C(56, 56)
-    c.disc(28, 28, 16, rgba(GRN))
-    c.glow(3, 1.6)
-    c.disc(28, 28, 10, rgba(WHITE))
+    c = C(72, 72)
+    c.disc(36, 36, 16, rgba(CYAN))
+    c.glow(6, 1.3)
+    c.disc(36, 36, 10, rgba(WHITE))
     c.save("cursor")
 
 
