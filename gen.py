@@ -124,7 +124,7 @@ def hitcircles():
     blank("hitcircleoverlay")
 
     a = C(126, 126)
-    a.ring(63, 63, 60, 3, rgba(WHITE))
+    a.ring(63, 63, 59, 6, rgba(WHITE))   # thick rim reads at small sizes
     a.save("approachcircle")
 
     for n in range(10):
@@ -161,7 +161,7 @@ def sliders():
     p.save("sliderscorepoint")
 
     f = C(24, 8)
-    f.rect(4, 3, 20, 5, fill=rgba(GRN, 0.7))
+    f.rect(4, 3, 20, 5, fill=rgba(WHITE, 0.8))
     f.save("followpoint")
 
     for name in ("lighting", "particle50", "particle100", "particle300"):
@@ -185,6 +185,8 @@ def cursor(src):
     for name in ("cursor", "cursortrail"):
         im = Image.open(src / f"{name}.png").convert("RGBA")
         r, g, _, a = im.split()
+        if name == "cursortrail":
+            a = a.point(lambda v: v // 2)
         Image.merge("RGBA", (r, g, r, a)).save(OUT / f"{name}.png")
 
     s = C(16, 16)
@@ -247,11 +249,11 @@ def scorebar():
 
     # With a marker the colour sits at (12,12) and is multiply tinted.
     col = C(600, 8)
-    col.rect(0, 0, 600, 8, fill=rgba(GRN))
+    col.rect(0, 0, 600, 8, fill=rgba(WHITE))
     col.save("scorebar-colour")
 
     mk = C(24, 24)
-    mk.rect(8, 6, 16, 18, fill=rgba(WHITE))
+    mk.rect(8, 6, 16, 18, fill=rgba(GRN))
     mk.glow(3, 1.6)
     mk.save("scorebar-marker")
 
@@ -266,8 +268,8 @@ def score_fonts():
         if key in ("comma", "dot"):
             w = 14
         c = C(w, (b - t) / K + 10)
-        c.d.text((c.w * K / 2, c.h * K / 2), ch, font=f, fill=rgba(GRN), anchor="mm")
-        c.glow(2.5, 1.3)
+        c.d.text((c.w * K / 2, c.h * K / 2), ch, font=f, fill=rgba(WHITE), anchor="mm")
+        c.glow(2, 0.8)
         c.save(f"score-{key}")
 
         f2 = ImageFont.truetype(FONT, 14 * K)
@@ -278,12 +280,11 @@ def score_fonts():
 
 def input_overlay():
     bg = C(193, 55)
-    bg.rect(1, 1, 192, 54, fill=rgba((0, 0, 0), 0.7), outline=rgba(GRN, 0.34))
-    bg.brackets(1, 1, 192, 54, 8, rgba(GRN), 1)
+    bg.rect(1, 1, 192, 54, fill=rgba((0, 0, 0), 0.7), outline=rgba(WHITE, 0.25))
     bg.save("inputoverlay-background")
 
     k = C(43, 46)
-    k.rect(4, 5, 39, 41, fill=rgba(WHITE, 0.12), outline=rgba(WHITE), width=2)
+    k.rect(4, 5, 39, 41, fill=rgba(WHITE, 0.06), outline=rgba(WHITE), width=2)
     k.save("inputoverlay-key")
 
 
@@ -513,6 +514,25 @@ def mod_icons():
         c.save(f"selection-mod-{name}")
 
 
+def extras():
+    """Remaining elements from the wiki list that would fall back to default."""
+    sel = C(128, 128)
+    sel.ring(64, 64, 60, 3, rgba(WHITE))
+    sel.save("hitcircleselect")
+
+    rip = C(128, 128)
+    rip.ring(64, 64, 50, 2, rgba(WHITE, 0.6))
+    rip.save("cursor-ripple")
+
+    text_img("multi-skipped", "skip", 18, rgba(WHITE, 0.8), pad=4, glow=0)
+    text_img("score-pp", "pp", 40, rgba(WHITE), pad=4, glow=2)
+    text_img("ranking-winner", "winner", 48, rgba(GRN))
+
+    rf = C(25, 25)
+    rf.rect(4, 4, 21, 21, outline=rgba(GRN), width=2)
+    rf.save("rank-forum")
+
+
 # ---------------------------------------------------------------- skin.ini
 
 SKIN_INI = """[General]
@@ -538,7 +558,7 @@ Combo1: 0,255,0
 Combo2: 0,204,0
 Combo3: 120,255,120
 Combo4: 0,160,60
-InputOverlayText: 0,255,0
+InputOverlayText: 255,255,255
 MenuGlow: 0,255,0
 SliderBorder: 0,255,0
 SliderTrackOverride: 0,18,0
@@ -565,7 +585,7 @@ def main():
     cursor(src)
     for f in (hitcircles, sliders, judgements, spinner, scorebar, score_fonts,
               input_overlay, playfield, pause_screens, ranking, menu_background,
-              song_select, modes, mod_icons):
+              song_select, modes, mod_icons, extras):
         f()
     (OUT / "skin.ini").write_text(SKIN_INI)
     for snd in src.iterdir():
