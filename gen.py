@@ -549,9 +549,8 @@ SpinnerNoBlink: 1
 
 [Colours]
 Combo1: 0,255,0
-Combo2: 0,140,45
-Combo3: 175,255,175
-Combo4: 150,220,0
+Combo2: 0,165,0
+Combo3: 0,95,0
 InputOverlayText: 0,255,0
 MenuGlow: 0,255,0
 SliderBorder: 26,26,26
