@@ -148,6 +148,8 @@ def sliders():
     b.disc(59, 59, 9, rgba(WHITE))
     b.save("sliderb")
     blank("sliderb-nd")
+    blank("sliderendcircle")          # no circle at the slider tail; without this
+    blank("sliderendcircleoverlay")   # stable falls back to the hit circle
     blank("sliderb-spec")
 
     r = C(128, 128)
