@@ -2,14 +2,16 @@
 """Generate P1, an osu!stable skin styled after pax.moe.
 
 Every element is drawn at SS x the @2x size, then downsampled to @2x and @1x.
-Sizes below are in @1x ("logical") pixels. Sounds and the cursor come from the
-Beafowl skin; gameplay sounds can come from another skin.
-Usage: gen.py <out_dir> <beafowl_dir> [hitsound_skin_dir]
+Sizes below are in @1x ("logical") pixels. Everything visual is drawn here.
+The cursor and sounds can optionally come from skins you already have:
+    gen.py OUT [--assets SKIN] [--hitsounds SKIN]
 """
 
 import math
 import re
+import argparse
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,8 +26,18 @@ DARK = (0, 34, 0)           # hyprland inactive border
 RED = (255, 85, 85)         # quickshell bar warning
 WHITE = (255, 255, 255)
 
-FONT = "/usr/share/fonts/TTF/TerminessNerdFontMono-Bold.ttf"
-FONT_REG = "/usr/share/fonts/TTF/TerminessNerdFontMono-Regular.ttf"
+
+
+def find_font(pattern="Terminess Nerd Font Mono:style=Bold"):
+    """Resolve the font file through fontconfig, so any distro's install works."""
+    out = subprocess.run(["fc-match", "-f", "%{file}", pattern], capture_output=True, text=True)
+    path = out.stdout.strip()
+    if "Terminess" not in Path(path).name:
+        sys.exit(f"Terminess Nerd Font not found (fc-match gave {path or 'nothing'}); install it first")
+    return path
+
+
+FONT = find_font()
 
 OUT: Path
 
@@ -181,14 +193,22 @@ def judgements():
     blank("comboburst")
 
 
-def cursor(src):
-    """Beafowl's cyan cursor and trail made green: blue := red keeps white white.
+def cursor(src=None):
+    """The cursor of an existing skin made green (blue := red keeps white white),
+    or, without one, a ring with a centre dot. No trail either way.
 
-    Beafowl ships no @2x, so none is written here either; a leftover @2x would win."""
+    Source cursors may ship no @2x, so none is written for them; a leftover @2x would win."""
+    blank("cursortrail")
+    if src is None:
+        c = C(64, 64)
+        c.ring(32, 32, 15, 2, rgba(GRN))
+        c.disc(32, 32, 3, rgba(WHITE))
+        c.glow(3, 1.8)
+        c.save("cursor")
+        return
     im = Image.open(src / "cursor.png").convert("RGBA")
     r, g, _, a = im.split()
     Image.merge("RGBA", (r, g, r, a)).save(OUT / "cursor.png")
-    blank("cursortrail")
 
     s = C(16, 16)
     s.disc(8, 8, 3, rgba(GRN, 0.5))
@@ -573,26 +593,31 @@ ComboOverlap: 4
 
 def main():
     global OUT
-    OUT = Path(sys.argv[1])
+    ap = argparse.ArgumentParser(description="Render the P1 osu!stable skin.")
+    ap.add_argument("out", type=Path, help="output skin folder")
+    ap.add_argument("--assets", type=Path, help="existing skin to take the cursor and all sounds from")
+    ap.add_argument("--hitsounds", type=Path, help="existing skin whose gameplay sounds replace --assets' ones")
+    args = ap.parse_args()
+    OUT = args.out
     OUT.mkdir(parents=True, exist_ok=True)
-    src = Path(sys.argv[2])
-    cursor(src)
+    cursor(args.assets)
     for f in (hitcircles, sliders, judgements, spinner, scorebar, score_fonts,
               input_overlay, playfield, pause_screens, ranking, menu_background,
               song_select, modes, mod_icons, extras):
         f()
     (OUT / "skin.ini").write_text(SKIN_INI)
-    for snd in src.iterdir():
-        if snd.suffix.lower() in (".wav", ".ogg", ".mp3"):
-            shutil.copy2(snd, OUT / snd.name)
-    if len(sys.argv) > 3:
+    if args.assets:
+        for snd in args.assets.iterdir():
+            if snd.suffix.lower() in (".wav", ".ogg", ".mp3"):
+                shutil.copy2(snd, OUT / snd.name)
+    if args.hitsounds:
         # Gameplay sounds from another skin replace Beafowl's entirely: same
         # names in another extension, or numbered variants, would mix sets.
         hit = re.compile(r"^((normal|soft|drum)-(hit|slider)|nightcore-|combobreak)", re.I)
         for f in OUT.iterdir():
             if f.suffix.lower() in (".wav", ".ogg", ".mp3") and hit.match(f.name):
                 f.unlink()
-        for snd in Path(sys.argv[3]).rglob("*"):
+        for snd in args.hitsounds.rglob("*"):
             if snd.suffix.lower() in (".wav", ".ogg", ".mp3") and hit.match(snd.name):
                 shutil.copy2(snd, OUT / snd.name)
     print(f"{sum(1 for _ in OUT.iterdir())} files in {OUT}")
