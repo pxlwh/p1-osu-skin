@@ -443,10 +443,7 @@ def song_select():
     s = C(50, 50)
     s.rect(17, 17, 33, 33, fill=rgba(WHITE))
     s.save("star")
-    s2 = C(24, 24)
-    s2.disc(12, 12, 4, rgba(GRN))
-    s2.glow(3, 1.4)
-    s2.save("star2")
+    blank("star2")   # kiai side fountains, combo burst, cursor and song select particles
 
     for side in ("left", "middle", "right"):
         bt = C(16 if side != "middle" else 4, 52)
