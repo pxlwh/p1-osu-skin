@@ -611,7 +611,7 @@ def main():
             if snd.suffix.lower() in (".wav", ".ogg", ".mp3"):
                 shutil.copy2(snd, OUT / snd.name)
     if args.hitsounds:
-        # Gameplay sounds from another skin replace Beafowl's entirely: same
+        # Gameplay sounds from --hitsounds replace the --assets ones entirely: same
         # names in another extension, or numbered variants, would mix sets.
         hit = re.compile(r"^((normal|soft|drum)-(hit|slider)|nightcore-|combobreak)", re.I)
         for f in OUT.iterdir():
