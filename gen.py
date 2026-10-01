@@ -554,6 +554,7 @@ Combo3: 255,176,0
 InputOverlayText: 0,255,0
 MenuGlow: 0,255,0
 SliderBorder: 90,90,90
+SliderTrackOverride: 14,14,14
 SongSelectActiveText: 0,255,0
 SongSelectInactiveText: 0,170,0
 SpinnerBackground: 0,0,0
