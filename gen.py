@@ -194,9 +194,16 @@ def judgements():
     blank("comboburst")
 
 
-def cursor():
-    """A solid dot: white core, phosphor green band, short glow. No trail."""
-    blank("cursortrail")
+def cursor(src=None):
+    """A solid dot: white core, phosphor green band, short glow. The trail comes
+    from --assets when that skin has one (recoloured green: blue := red keeps
+    white white; no @2x is written so none can override it), otherwise none."""
+    trail = src / "cursortrail.png" if src else None
+    if trail and trail.exists():
+        r, g, _, a = Image.open(trail).convert("RGBA").split()
+        Image.merge("RGBA", (r, g, r, a)).save(OUT / "cursortrail.png")
+    else:
+        blank("cursortrail")
     c = C(56, 56)
     c.disc(28, 28, 16, rgba(GRN))
     c.glow(3, 1.6)
@@ -584,13 +591,13 @@ def main():
     global OUT
     ap = argparse.ArgumentParser(description="Render the P1 osu!stable skin.")
     ap.add_argument("out", type=Path, help="output skin folder")
-    ap.add_argument("--assets", type=Path, help="existing skin to take all sounds from")
+    ap.add_argument("--assets", type=Path, help="existing skin to take all sounds and the cursor trail from")
     ap.add_argument("--hitsounds", type=Path, help="existing skin whose gameplay sounds replace --assets' ones")
     ap.add_argument("--osk", type=Path, help="also pack the finished skin into this .osk file")
     args = ap.parse_args()
     OUT = args.out
     OUT.mkdir(parents=True, exist_ok=True)
-    cursor()
+    cursor(args.assets)
     for f in (hitcircles, sliders, judgements, spinner, scorebar, score_fonts,
               input_overlay, playfield, pause_screens, ranking, menu_background,
               song_select, modes, mod_icons, extras):
