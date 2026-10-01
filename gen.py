@@ -151,9 +151,7 @@ def sliders():
     blank("sliderb-spec")
 
     r = C(128, 128)
-    for dx in (-12, 10):
-        r.line([(64 + dx - 14, 40), (64 + dx + 10, 64), (64 + dx - 14, 88)], rgba(WHITE), 6)  # points right; the game rotates it
-    r.glow(2, 1.3)
+    r.text(">", 64, 62, 72, rgba(WHITE))   # Terminess, like the numbers; points right, the game rotates it
     r.save("reversearrow")
 
     p = C(16, 16)
