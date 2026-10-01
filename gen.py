@@ -3,7 +3,7 @@
 
 Every element is drawn at SS x the @2x size, then downsampled to @2x and @1x.
 Sizes below are in @1x ("logical") pixels. Everything visual is drawn here.
-The cursor and sounds can optionally come from skins you already have:
+Sounds can optionally come from skins you already have:
     gen.py OUT [--assets SKIN] [--hitsounds SKIN]
 """
 
@@ -13,6 +13,7 @@ import argparse
 import shutil
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -193,26 +194,14 @@ def judgements():
     blank("comboburst")
 
 
-def cursor(src=None):
-    """The cursor of an existing skin made green (blue := red keeps white white),
-    or, without one, a ring with a centre dot. No trail either way.
-
-    Source cursors may ship no @2x, so none is written for them; a leftover @2x would win."""
+def cursor():
+    """A solid dot: white core, phosphor green band, short glow. No trail."""
     blank("cursortrail")
-    if src is None:
-        c = C(64, 64)
-        c.ring(32, 32, 15, 2, rgba(GRN))
-        c.disc(32, 32, 3, rgba(WHITE))
-        c.glow(3, 1.8)
-        c.save("cursor")
-        return
-    im = Image.open(src / "cursor.png").convert("RGBA")
-    r, g, _, a = im.split()
-    Image.merge("RGBA", (r, g, r, a)).save(OUT / "cursor.png")
-
-    s = C(16, 16)
-    s.disc(8, 8, 3, rgba(GRN, 0.5))
-    s.save("cursor-smoke")
+    c = C(56, 56)
+    c.disc(28, 28, 16, rgba(GRN))
+    c.glow(3, 1.6)
+    c.disc(28, 28, 10, rgba(WHITE))
+    c.save("cursor")
 
 
 def spinner():
@@ -595,12 +584,13 @@ def main():
     global OUT
     ap = argparse.ArgumentParser(description="Render the P1 osu!stable skin.")
     ap.add_argument("out", type=Path, help="output skin folder")
-    ap.add_argument("--assets", type=Path, help="existing skin to take the cursor and all sounds from")
+    ap.add_argument("--assets", type=Path, help="existing skin to take all sounds from")
     ap.add_argument("--hitsounds", type=Path, help="existing skin whose gameplay sounds replace --assets' ones")
+    ap.add_argument("--osk", type=Path, help="also pack the finished skin into this .osk file")
     args = ap.parse_args()
     OUT = args.out
     OUT.mkdir(parents=True, exist_ok=True)
-    cursor(args.assets)
+    cursor()
     for f in (hitcircles, sliders, judgements, spinner, scorebar, score_fonts,
               input_overlay, playfield, pause_screens, ranking, menu_background,
               song_select, modes, mod_icons, extras):
@@ -621,6 +611,12 @@ def main():
             if snd.suffix.lower() in (".wav", ".ogg", ".mp3") and hit.match(snd.name):
                 shutil.copy2(snd, OUT / snd.name)
     print(f"{sum(1 for _ in OUT.iterdir())} files in {OUT}")
+    if args.osk:
+        # An .osk is a zip of the skin folder's files; osu! imports it on open.
+        with zipfile.ZipFile(args.osk, "w", zipfile.ZIP_DEFLATED) as z:
+            for f in sorted(OUT.iterdir()):
+                z.write(f, f.name)
+        print(f"packed {args.osk}")
 
 
 if __name__ == "__main__":
