@@ -2,8 +2,8 @@
 """Generate the pax.moe osu!stable skin.
 
 Every element is drawn at SS x the @2x size, then downsampled to @2x and @1x.
-Sizes below are in @1x ("logical") pixels. Sounds are not generated: they are
-copied from the Beafowl skin. Usage: gen.py <out_dir> [sound_source_dir]
+Sizes below are in @1x ("logical") pixels. Sounds and the cursor come from the
+Beafowl skin. Usage: gen.py <out_dir> <beafowl_dir>
 """
 
 import math
@@ -121,10 +121,7 @@ def hitcircles():
     c.ring(64, 64, 49, 1, rgba(WHITE, 0.35))
     c.save("hitcircle")
 
-    o = C(128, 128)
-    o.brackets(10, 10, 118, 118, 15, rgba(GRN), 2)   # just outside the ring
-    o.glow(2, 1.6)
-    o.save("hitcircleoverlay")
+    blank("hitcircleoverlay")
 
     a = C(126, 126)
     a.ring(63, 63, 60, 3, rgba(WHITE))
@@ -142,7 +139,6 @@ def hitcircles():
 def sliders():
     s = C(256, 256)
     s.ring(128, 128, 118, 2, rgba(GRN, 0.85))
-    s.brackets(30, 30, 226, 226, 22, rgba(GRN), 2)
     s.glow(3, 1.5)
     s.save("sliderfollowcircle")
 
@@ -168,16 +164,8 @@ def sliders():
     f.rect(4, 3, 20, 5, fill=rgba(GRN, 0.7))
     f.save("followpoint")
 
-    li = C(100, 100)
-    li.disc(50, 50, 24, rgba(GRN, 0.5))
-    li.glow(14, 1.0)
-    li.save("lighting")
-
-    for name, col in (("particle50", rgba(GRN, 0.34)), ("particle100", rgba(GRN, 0.66)),
-                      ("particle300", rgba(GRN))):
-        q = C(7, 7)
-        q.rect(1, 1, 6, 6, fill=col)
-        q.save(name)
+    for name in ("lighting", "particle50", "particle100", "particle300"):
+        blank(name)
 
 
 def judgements():
@@ -190,17 +178,14 @@ def judgements():
     blank("comboburst")
 
 
-def cursor():
-    c = C(64, 64)
-    c.ring(32, 32, 15, 2, rgba(GRN))
-    c.disc(32, 32, 3, rgba(WHITE))
-    c.glow(3, 1.8)
-    c.save("cursor")
+def cursor(src):
+    """Beafowl's cyan cursor and trail made green: blue := red keeps white white.
 
-    t = C(16, 16)
-    t.disc(8, 8, 4, rgba(GRN, 0.55))
-    t.glow(1.5, 1.2)
-    t.save("cursortrail")
+    Beafowl ships no @2x, so none is written here either; a leftover @2x would win."""
+    for name in ("cursor", "cursortrail"):
+        im = Image.open(src / f"{name}.png").convert("RGBA")
+        r, g, _, a = im.split()
+        Image.merge("RGBA", (r, g, r, a)).save(OUT / f"{name}.png")
 
     s = C(16, 16)
     s.disc(8, 8, 3, rgba(GRN, 0.5))
@@ -222,7 +207,6 @@ def spinner():
 
     t = C(size, size)
     t.ring(m, m, 180, 1, rgba(GRN, 0.34))
-    t.brackets(m - 150, m - 150, m + 150, m + 150, 24, rgba(GRN), 2)
     t.save("spinner-top")
 
     mid = C(160, 160)
@@ -331,32 +315,14 @@ def playfield():
     t.save("options-offset-tick")
 
 
-def crt(w, h, alpha):
-    """Black screen with faint scanlines."""
-    c = C(w, h, rgba((0, 0, 0), alpha))
-    for y in range(0, h, 4):
-        c.rect(0, y, w, y + 1, fill=rgba(GRN, 0.035))
-    return c
-
-
 def pause_screens():
-    W, H = 1366, 768
-    for name, title, col in (("pause-overlay", "paused", GRN), ("fail-background", "signal lost", RED)):
-        c = crt(W, H, 0.82)
-        c.brackets(40, 40, W - 40, H - 40, 40, rgba(col, 0.66), 2)
-        c.text(title, W / 2, 150, 84, rgba(col))
-        c.text("_", W / 2 + len(title) * 22 + 20, 150, 84, rgba(col, 0.66))
-        c.glow(4, 1.2)
-        c.save(name)
+    """Plain: a dark overlay and text buttons, nothing else."""
+    for name in ("pause-overlay", "fail-background"):
+        C(1366, 768, rgba((0, 0, 0), 0.78)).save(name)
 
     for name, label in (("pause-continue", "continue"), ("pause-retry", "retry"),
                         ("pause-back", "back to menu"), ("pause-replay", "replay")):
-        b = C(420, 76)
-        b.rect(1, 1, 419, 75, fill=rgba((0, 0, 0), 0.9), outline=rgba(GRN, 0.34))
-        b.brackets(1, 1, 419, 75, 14, rgba(GRN), 2)
-        b.text(f"[ {label} ]", 210, 38, 34, rgba(GRN))
-        b.glow(2, 1.2)
-        b.save(name)
+        text_img(name, label, 40, rgba(GRN), pad=16, glow=2)
 
 
 # ---------------------------------------------------------------- ranking
@@ -595,16 +561,16 @@ def main():
     global OUT
     OUT = Path(sys.argv[1])
     OUT.mkdir(parents=True, exist_ok=True)
-    for f in (hitcircles, sliders, judgements, cursor, spinner, scorebar, score_fonts,
+    src = Path(sys.argv[2])
+    cursor(src)
+    for f in (hitcircles, sliders, judgements, spinner, scorebar, score_fonts,
               input_overlay, playfield, pause_screens, ranking, menu_background,
               song_select, modes, mod_icons):
         f()
     (OUT / "skin.ini").write_text(SKIN_INI)
-    if len(sys.argv) > 2:
-        src = Path(sys.argv[2])
-        for snd in src.iterdir():
-            if snd.suffix.lower() in (".wav", ".ogg", ".mp3"):
-                shutil.copy2(snd, OUT / snd.name)
+    for snd in src.iterdir():
+        if snd.suffix.lower() in (".wav", ".ogg", ".mp3"):
+            shutil.copy2(snd, OUT / snd.name)
     print(f"{sum(1 for _ in OUT.iterdir())} files in {OUT}")
 
 
