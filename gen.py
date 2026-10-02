@@ -207,6 +207,13 @@ def cursor(src=None):
         shutil.copy(trail, OUT / "cursortrail.png")
     else:
         blank("cursortrail")
+    blank("cursormiddle")   # optional top layer; blank so nothing can fall back to default
+
+    sm = C(24, 24)          # smoke (hold C): soft cyan dots that build a line
+    sm.disc(12, 12, 5, rgba(CYAN, 0.55))
+    sm.glow(3, 1.0)
+    sm.save("cursor-smoke")
+
     c = C(72, 72)
     c.disc(36, 36, 16, rgba(CYAN))
     c.glow(6, 1.3)
@@ -347,6 +354,12 @@ def playfield():
     t = C(4, 24)
     t.rect(1, 0, 3, 24, fill=rgba(WHITE))
     t.save("options-offset-tick")
+
+    # Pillars beside 4:3 storyboards on widescreen. Origin right; the game
+    # stretches it and flips it for the right side, so the hairline is inner.
+    mb = C(24, 768, rgba((0, 0, 0)))
+    mb.rect(22, 0, 24, 768, fill=rgba(GRN, 0.34))
+    mb.save("masking-border")
 
 
 def pause_screens():
