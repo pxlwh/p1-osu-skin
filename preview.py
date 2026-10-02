@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 W = 1600
 PAD = 48
-COMBOS = [(0, 255, 0), (0, 165, 0), (0, 95, 0)]
+COMBOS = [(0, 255, 0), (255, 40, 170), (170, 60, 255)]
 LABEL = (0, 170, 0)
 DIM = (0, 90, 0)
 
