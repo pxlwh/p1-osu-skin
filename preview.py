@@ -98,6 +98,7 @@ def main():
         (load(skin, "sliderfollowcircle", 170), "follow circle"),
         (load(skin, "reversearrow", 120), "reverse"),
         (load(skin, "cursor", 90), "cursor"),
+        (load(skin, "cursortrail", 55), "trail"),
         (load(skin, "cursor-smoke", 40), "smoke"),
     ])
     # Assembled the way osu! layers the new style spinner (wiki order, bottom to

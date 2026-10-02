@@ -197,16 +197,36 @@ def judgements():
     blank("comboburst")
 
 
-def cursor(src=None):
+# Trail dot: alpha by radius in @1x px, a solid core with a soft falloff,
+# linearly interpolated between these points.
+TRAIL_PROFILE = [(0, 255), (15, 255), (16, 192), (17, 118), (18, 84), (19, 58),
+                 (20, 37), (21, 21), (22, 10), (23, 5), (24, 2), (26, 0)]
+
+
+def trail_alpha(r):
+    for (r0, a0), (r1, a1) in zip(TRAIL_PROFILE, TRAIL_PROFILE[1:]):
+        if r <= r1:
+            return a0 + (a1 - a0) * (r - r0) / (r1 - r0)
+    return 0
+
+
+def cursor_trail():
+    """55 px cyan dot that the cursor glow blends into; drawn per pixel from
+    TRAIL_PROFILE so the falloff is exact rather than a blur guess."""
+    c = C(55, 55)
+    n, mid = c.im.width, c.im.width / 2
+    alpha = Image.new("L", (n, n))
+    alpha.putdata([round(trail_alpha(math.hypot(x + 0.5 - mid, y + 0.5 - mid) / K))
+                   for y in range(n) for x in range(n)])
+    c.im = Image.new("RGBA", (n, n), rgba(CYAN))
+    c.im.putalpha(alpha)
+    c.save("cursortrail")
+
+
+def cursor():
     """A solid dot: white core, cyan band, wide soft glow that fades into the
-    trail. Cyan so the cursor stands apart from the green circles. The trail
-    comes from --assets when that skin has one, used as is (no @2x is written
-    so none can override it), otherwise none."""
-    trail = src / "cursortrail.png" if src else None
-    if trail and trail.exists():
-        shutil.copy(trail, OUT / "cursortrail.png")
-    else:
-        blank("cursortrail")
+    trail. Cyan so the cursor stands apart from the green circles."""
+    cursor_trail()
     blank("cursormiddle")   # optional top layer; blank so nothing can fall back to default
 
     sm = C(24, 24)          # smoke (hold C): soft cyan dots that build a line
@@ -620,13 +640,13 @@ def main():
     global OUT
     ap = argparse.ArgumentParser(description="Render the P1 osu!stable skin.")
     ap.add_argument("out", type=Path, help="output skin folder")
-    ap.add_argument("--assets", type=Path, help="existing skin to take all sounds and the cursor trail from")
+    ap.add_argument("--assets", type=Path, help="existing skin to take all sounds from")
     ap.add_argument("--hitsounds", type=Path, help="existing skin whose gameplay sounds replace --assets' ones")
     ap.add_argument("--osk", type=Path, help="also pack the finished skin into this .osk file")
     args = ap.parse_args()
     OUT = args.out
     OUT.mkdir(parents=True, exist_ok=True)
-    cursor(args.assets)
+    cursor()
     for f in (hitcircles, sliders, judgements, spinner, scorebar, score_fonts,
               input_overlay, playfield, pause_screens, ranking, menu_background,
               song_select, modes, mod_icons, extras):
