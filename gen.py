@@ -157,7 +157,7 @@ def hitcircles():
 
 def sliders():
     # Not tinted by the game (Normal blend), so one colour serves every combo:
-    # white stays neutral around green, pink and violet sliders.
+    # white stays neutral around every combo colour.
     s = C(256, 256)
     s.ring(128, 128, 118, 2, rgba(WHITE, 0.85))
     s.glow(3, 1.5)
@@ -648,7 +648,8 @@ SpinnerNoBlink: 1
 
 [Colours]
 Combo1: 0,255,0
-Combo2: 170,60,255
+Combo2: 0,180,0
+Combo3: 0,100,0
 InputOverlayText: 0,255,0
 MenuGlow: 0,255,0
 SliderBorder: 26,26,26
