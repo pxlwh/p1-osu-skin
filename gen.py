@@ -240,14 +240,27 @@ def spinner():
     mid2.glow(2, 1.5)
     mid2.save("spinner-middle2")
 
+    # The game tints the glow cyan (additive): drawn pure green, cyan x green = green.
     g = C(size, size)
-    g.ring(m, m, 214, 10, rgba(WHITE, 0.6))
+    g.ring(m, m, 214, 10, rgba(GRN, 0.6))
     g.glow(10, 1.0)
     g.save("spinner-glow")
 
     a = C(384, 384)
     a.ring(192, 192, 188, 3, rgba(GRN))
     a.save("spinner-approachcircle")
+
+    # osu!taiko still uses spinner-circle with the new style; reuse the dial look.
+    c = C(size, size)
+    for i in range(72):
+        ang = 2 * math.pi * i / 72
+        r0, r1 = (206, 222) if i % 6 else (196, 226)
+        c.line([(m + r0 * math.cos(ang), m + r0 * math.sin(ang)),
+                (m + r1 * math.cos(ang), m + r1 * math.sin(ang))],
+               rgba(GRN, 0.66 if i % 6 else 1.0), 2)
+    c.disc(m, m, 6, rgba(GRN))
+    c.glow(2, 1.2)
+    c.save("spinner-circle")
 
     r = C(280, 56)
     r.rect(1, 1, 279, 55, fill=rgba((0, 0, 0), 0.85), outline=rgba(GRN, 0.34))

@@ -99,8 +99,28 @@ def main():
         (load(skin, "reversearrow", 120), "reverse"),
         (load(skin, "cursor", 90), "cursor"),
     ])
+    # Assembled the way osu! layers the new style spinner (wiki order, bottom to
+    # top): glow (tinted cyan, additive), bottom, top, middle2, middle (tinted
+    # white at the start, red as time runs out), then the approach circle.
+    size = 260
+    full = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    glow = tint(load(skin, "spinner-glow", size), (0, 255, 255))
+    full = Image.alpha_composite(full, glow)
+    for name, h in (("spinner-bottom", size), ("spinner-top", size), ("spinner-middle2", 22), ("spinner-middle", 86)):
+        im = load(skin, name, h)
+        full.alpha_composite(im, ((size - im.width) // 2, (size - im.height) // 2))
+    ap = load(skin, "spinner-approachcircle", 200)
+    full.alpha_composite(ap, ((size - ap.width) // 2, (size - ap.height) // 2))
     s.group("spinner", [
-        (load(skin, "spinner-bottom", 240), "dial"),
+        (full, "assembled"),
+        (tint(load(skin, "spinner-glow", 150), (0, 255, 255)), "glow (tinted)"),
+        (load(skin, "spinner-bottom", 150), "bottom"),
+        (load(skin, "spinner-top", 150), "top"),
+        (load(skin, "spinner-middle", 70), "middle"),
+        (tint(load(skin, "spinner-middle", 70), (255, 70, 70)), "middle (late)"),
+        (load(skin, "spinner-middle2", 40), "middle2"),
+        (load(skin, "spinner-approachcircle", 150), "approach"),
+        (load(skin, "spinner-circle", 150), "circle (taiko)"),
         (load(skin, "spinner-rpm", 56), "rpm"),
         (load(skin, "spinner-clear", 70), "clear"),
         (load(skin, "spinner-spin", 56), "spin"),
