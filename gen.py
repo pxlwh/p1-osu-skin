@@ -260,7 +260,7 @@ def cursor():
     """A solid dot: white core, cyan band, wide soft glow that fades into the
     trail. Cyan so the cursor stands apart from the green circles."""
     cursor_trail()
-    blank("cursormiddle")   # optional top layer; blank so nothing can fall back to default
+    # no cursormiddle: its presence switches stable to the continuous trail; Beafowl uses the disjoint one
 
     sm = C(24, 24)          # smoke (hold C): soft cyan dots that build a line
     sm.disc(12, 12, 5, rgba(CYAN, 0.55))
