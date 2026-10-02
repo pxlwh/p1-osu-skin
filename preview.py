@@ -93,8 +93,9 @@ def main():
         im.alpha_composite(num, ((im.width - num.width) // 2, (im.height - num.height) // 2))
         circles.append((im, f"combo {i + 1}"))
     s.group("hit circles", circles + [
-        (tint(load(skin, "approachcircle", 140), COMBOS[0]), "approach"),
-        (tint(load(skin, "sliderb", 120), COMBOS[0]), "slider ball"),
+    ] + [(tint(load(skin, "approachcircle", 120), c), f"approach {i + 1}") for i, c in enumerate(COMBOS)] + [
+        (load(skin, "sliderb", 110), "slider ball"),
+        (load(skin, "sliderscorepoint", 24), "tick"),
         (load(skin, "sliderfollowcircle", 170), "follow circle"),
         (load(skin, "reversearrow", 120), "reverse"),
         (load(skin, "cursor", 90), "cursor"),

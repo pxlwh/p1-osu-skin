@@ -156,8 +156,10 @@ def hitcircles():
 
 
 def sliders():
+    # Not tinted by the game (Normal blend), so one colour serves every combo:
+    # white stays neutral around green, pink and violet sliders.
     s = C(256, 256)
-    s.ring(128, 128, 118, 2, rgba(GRN, 0.85))
+    s.ring(128, 128, 118, 2, rgba(WHITE, 0.85))
     s.glow(3, 1.5)
     s.save("sliderfollowcircle")
 
@@ -175,8 +177,8 @@ def sliders():
     r.save("reversearrow")
 
     p = C(16, 16)
-    p.rect(5, 5, 11, 11, fill=rgba(GRN))
-    p.glow(1.5, 1.5)
+    p.rect(5, 5, 11, 11, fill=rgba(WHITE))
+    p.glow(1.5, 1.2)
     p.save("sliderscorepoint")
 
     f = C(24, 8)
@@ -600,7 +602,7 @@ Name: P1
 Author: pax
 Version: 2.7
 AnimationFramerate: -1
-AllowSliderBallTint: 1
+AllowSliderBallTint: 0
 ComboBurstRandom: 0
 CursorCentre: 1
 CursorExpand: 0
