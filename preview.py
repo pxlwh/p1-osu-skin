@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 W = 1600
 PAD = 48
-COMBOS = [(0, 255, 0), (255, 40, 170), (170, 60, 255)]
+COMBOS = [(0, 255, 0), (170, 60, 255)]
 LABEL = (0, 170, 0)
 DIM = (0, 90, 0)
 
@@ -81,6 +81,18 @@ class Sheet:
         print(f"wrote {out} ({W}x{height})")
 
 
+def follow_line(skin, scale=0.56, spacing=32, n=4):
+    """Follow points as osu! lays them out: every 32 osu px at circle scale
+    (0.56 = CS 4), each piece overlapping the next into one line."""
+    fp = load(skin, "followpoint-36")   # mid animation, full strength
+    w, h = int(fp.width / 2 * scale), max(1, int(fp.height / 2 * scale))
+    fp = fp.resize((w, h), Image.LANCZOS)
+    line = Image.new("RGBA", (int(spacing * (n - 1) + w), h), (0, 0, 0, 0))
+    for i in range(n):
+        line.alpha_composite(fp, (int(i * spacing), 0))
+    return line.resize((line.width * 2, line.height * 2), Image.LANCZOS)
+
+
 def main():
     skin, out = Path(sys.argv[1]), Path(sys.argv[2])
     s = Sheet()
@@ -96,6 +108,7 @@ def main():
     ] + [(tint(load(skin, "approachcircle", 120), c), f"approach {i + 1}") for i, c in enumerate(COMBOS)] + [
         (load(skin, "sliderb", 110), "slider ball"),
         (load(skin, "sliderscorepoint", 24), "tick"),
+        (follow_line(skin), "follow line"),
         (load(skin, "sliderfollowcircle", 170), "follow circle"),
         (load(skin, "reversearrow", 120), "reverse"),
         (load(skin, "cursor", 90), "cursor"),

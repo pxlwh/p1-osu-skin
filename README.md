@@ -1,6 +1,6 @@
 # P1
 
-An osu!stable skin rendered from code. Black screen, a terminal font, phosphor green UI, combos in green, hot pink and violet, and a cyan cursor. The name is the code for the classic green phosphor in old terminals and scopes.
+An osu!stable skin rendered from code. Black screen, a terminal font, phosphor green UI, combos alternating green and violet, and a cyan cursor. The name is the code for the classic green phosphor in old terminals and scopes.
 
 ![P1 in gameplay](docs/gameplay.webp)
 
@@ -41,7 +41,7 @@ Rebuild into a fresh folder and replace the old one. Hidden elements are blank `
 * **4x supersampling.** Each element is drawn at four times its `@2x` size, then downsampled to `@2x` and `@1x`. Edges and thin rings come out smooth without a separate antialiasing pass.
 * **White where the game tints.** osu! multiplies hit circles, approach circles, input keys and song select cards by a colour at draw time. Those are drawn white or grey so the combo colour shows through unchanged. The slider ball, slider ticks and follow circle stay white: the follow circle is never tinted by stable, so all three match it.
 * **Hidden, not missing.** Lighting, particles, combo bursts, kiai fountains, the cursor ripple and the slider tail circle are 1x1 transparent images. A missing file falls back to the default skin, so hiding takes a file.
-* **Palette.** `#00ff00` with dim tiers for the UI; saturated combo colours green `0,255,0`, hot pink `255,40,170` and violet `170,60,255`; cyan `40,234,242` for the cursor only; `#ff5555` for misses only. No combo uses cyan or red, so the cursor and misses always stand out.
+* **Palette.** `#00ff00` with dim tiers for the UI; saturated combo colours alternating green `0,255,0` and violet `170,60,255`; cyan `40,234,242` for the cursor only; `#ff5555` for misses only. No combo uses cyan or red, so the cursor and misses always stand out.
 
 ## Limits of stable skinning
 

@@ -181,12 +181,43 @@ def sliders():
     p.glow(1.5, 1.2)
     p.save("sliderscorepoint")
 
-    f = C(24, 8)
-    f.rect(4, 3, 20, 5, fill=rgba(WHITE, 0.8))
-    f.save("followpoint")
+    followpoints()
 
     for name in ("lighting", "particle50", "particle100", "particle300"):
         blank(name)
+
+
+
+FP_LEN, FP_FEATHER, FP_PEAK = 128, 24, 0.85   # @1x px, @1x px, opacity
+FP_FRAMES, FP_IN, FP_OUT = 72, 8, 14          # 1.2 s at AnimationFramerate 60
+
+
+def smooth(t):
+    t = min(1.0, max(0.0, t))
+    return t * t * (3 - 2 * t)
+
+
+def followpoints():
+    """A continuous line from overlapping pieces, built like the line
+    followpoints in Beafowl and piwack: osu! places a piece every 32 osu px at
+    the circle's scale and fades each one on its own, so the ends are feathered
+    (neighbours blend, a fading piece never leaves a hard edge) and every piece
+    also eases in and out over its own animation frames."""
+    base = C(FP_LEN, 12)
+    n_w, n_h = base.im.size
+    k = n_w / FP_LEN
+    feather = FP_FEATHER * k
+    across = [smooth(1 - abs(y + 0.5 - n_h / 2) / (2.2 * k)) for y in range(n_h)]
+    along = [smooth(min(x + 0.5, n_w - x - 0.5) / feather) for x in range(n_w)]
+    shape = [along[x] * across[y] for y in range(n_h) for x in range(n_w)]
+    for i in range(FP_FRAMES):
+        level = FP_PEAK * min(smooth(i / FP_IN), smooth((FP_FRAMES - 1 - i) / FP_OUT))
+        alpha = Image.new("L", (n_w, n_h))
+        alpha.putdata([round(255 * level * v) for v in shape])
+        c = C(FP_LEN, 12)
+        c.im = Image.new("RGBA", (n_w, n_h), rgba(WHITE))
+        c.im.putalpha(alpha)
+        c.save(f"followpoint-{i}")
 
 
 def judgements():
@@ -601,7 +632,7 @@ SKIN_INI = """[General]
 Name: P1
 Author: pax
 Version: 2.7
-AnimationFramerate: -1
+AnimationFramerate: 60
 AllowSliderBallTint: 0
 ComboBurstRandom: 0
 CursorCentre: 1
@@ -617,8 +648,7 @@ SpinnerNoBlink: 1
 
 [Colours]
 Combo1: 0,255,0
-Combo2: 255,40,170
-Combo3: 170,60,255
+Combo2: 170,60,255
 InputOverlayText: 0,255,0
 MenuGlow: 0,255,0
 SliderBorder: 26,26,26
