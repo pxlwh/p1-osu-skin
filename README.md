@@ -2,7 +2,9 @@
 
 An osu!stable skin rendered from code. Black screen, phosphor green, a terminal font, and an oscilloscope on the main menu. The name is the code for the classic green phosphor in old terminals and scopes.
 
-![P1 preview](docs/preview.png)
+![P1 in gameplay](docs/gameplay.webp)
+
+![P1 asset sheet](docs/preview.png)
 
 Every image is drawn by `gen.py` with Pillow. Change a colour or a stroke width, rerun it, and the whole skin follows.
 
@@ -30,7 +32,7 @@ python3 gen.py out/P1 --assets "Skins/Some Skin" --hitsounds "Skins/Other Skin" 
 * `--hitsounds` replaces only the gameplay sounds (hit, slider, nightcore, combobreak) with another skin's set. Any matching sound from `--assets` is removed first, in every extension and numbering, so two sets never mix.
 * `--osk` also packs the finished skin into an `.osk` (a zip of the skin folder).
 
-`preview.py out/P1 docs/preview.png` renders the preview frame above from any build.
+`preview.py out/P1 docs/preview.png` renders the asset sheet above from any build. The gameplay loop is a [danser-go](https://github.com/Wieku/danser-go) replay render, cut to 10 seconds and encoded as animated WebP so it plays inline on any git host.
 
 Rebuild into a fresh folder and replace the old one. Hidden elements are blank `@1x` files, and a stale `@2x` left behind by a previous build would win over them.
 
