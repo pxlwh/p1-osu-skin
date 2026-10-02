@@ -1,6 +1,6 @@
 # P1
 
-An osu!stable skin rendered from code. Black screen, phosphor green, a terminal font, and an oscilloscope on the main menu. The name is the code for the classic green phosphor in old terminals and scopes.
+An osu!stable skin rendered from code. Black screen, phosphor green, and a terminal font. The name is the code for the classic green phosphor in old terminals and scopes.
 
 ![P1 in gameplay](docs/gameplay.webp)
 
