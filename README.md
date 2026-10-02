@@ -32,7 +32,7 @@ python3 gen.py out/P1 --assets "Skins/Some Skin" --hitsounds "Skins/Other Skin" 
 * `--hitsounds` replaces only the gameplay sounds (hit, slider, nightcore, combobreak) with another skin's set. Any matching sound from `--assets` is removed first, in every extension and numbering, so two sets never mix.
 * `--osk` also packs the finished skin into an `.osk` (a zip of the skin folder).
 
-`preview.py out/P1 docs/preview.png` renders the asset sheet above from any build. The gameplay loop is a [danser-go](https://github.com/Wieku/danser-go) replay render, cut to 10 seconds and encoded as animated WebP so it plays inline on any git host.
+`preview.py out/P1 docs/preview.png` renders the asset sheet above from any build. The gameplay loop is a [danser-go](https://github.com/Wieku/danser-go) replay render, cut to 10 seconds and encoded as animated WebP so it plays inline on any git host. Every frame is a keyframe (Pillow `kmax=1`): with inter-frame deltas, lossy WebP leaves ghost blocks where objects used to be on the black background.
 
 Rebuild into a fresh folder and replace the old one. Hidden elements are blank `@1x` files, and a stale `@2x` left behind by a previous build would win over them.
 
